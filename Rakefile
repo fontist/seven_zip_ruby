@@ -2,6 +2,12 @@ require "fileutils"
 require "tempfile"
 require "bundler/gem_tasks"
 
+begin
+  require 'rspec/core/rake_task'
+  RSpec::Core::RakeTask.new(:spec)
+rescue LoadError
+end
+
 BINARY_FILES = [ "seven_zip_archive.so", "seven_zip_archive.bundle" ]
 MAKE = (ENV["MAKE"] || ENV["make"] || (RUBY_PLATFORM.include?("mswin") ? "nmake" : "make"))
 
