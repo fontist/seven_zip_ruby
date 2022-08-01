@@ -196,7 +196,7 @@ struct CFileNameAttr
   UString Name;
   UInt32 Attrib;
   Byte NameType;
-
+  
   bool IsDos() const { return NameType == kFileNameType_Dos; }
   bool Parse(const Byte *p, unsigned size);
 };
@@ -353,7 +353,7 @@ UInt32 CAttr::Parse(const Byte *p, unsigned size)
   if (size < 0x18)
     return 0;
   PRF(printf(" T=%2X", Type));
-
+  
   UInt32 length = Get32(p + 0x04);
   PRF(printf(" L=%3d", length));
   if (length > size)
@@ -516,7 +516,7 @@ class CInStream:
   UInt64 _curRem;
   bool _sparseMode;
   size_t _compressedPos;
-
+  
   UInt64 _tags[kNumCacheChunks];
   int _chunkSizeLog;
   CByteBuffer _inBuf;
@@ -678,11 +678,11 @@ STDMETHODIMP CInStream::Read(void *data, UInt32 size, UInt32 *processedSize)
     }
 
     PRF2(printf("\nVirtPos = %6d", _virtPos));
-
+    
     UInt32 comprUnitSize = (UInt32)1 << CompressionUnit;
     UInt64 virtBlock = _virtPos >> BlockSizeLog;
     UInt64 virtBlock2 = virtBlock & ~((UInt64)comprUnitSize - 1);
-
+    
     int left = 0, right = Extents.Size();
     for (;;)
     {
@@ -694,7 +694,7 @@ STDMETHODIMP CInStream::Read(void *data, UInt32 size, UInt32 *processedSize)
       else
         left = mid;
     }
-
+    
     bool isCompressed = false;
     UInt64 virtBlock2End = virtBlock2 + comprUnitSize;
     if (CompressionUnit != 0)
@@ -712,7 +712,7 @@ STDMETHODIMP CInStream::Read(void *data, UInt32 size, UInt32 *processedSize)
 
     int i;
     for (i = left; Extents[i + 1].Virt <= virtBlock; i++);
-
+    
     _sparseMode = false;
     if (!isCompressed)
     {
@@ -750,7 +750,7 @@ STDMETHODIMP CInStream::Read(void *data, UInt32 size, UInt32 *processedSize)
       _sparseMode = true;
       break;
     }
-
+    
     size_t offs = 0;
     UInt64 curVirt = virtBlock2;
     for (i = left; i < Extents.Size(); i++)
@@ -809,7 +809,7 @@ STDMETHODIMP CInStream::Read(void *data, UInt32 size, UInt32 *processedSize)
   _curRem -= size;
   return res;
 }
-
+ 
 STDMETHODIMP CInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition)
 {
   UInt64 newVirtPos = offset;
@@ -836,7 +836,7 @@ class CByteBufStream:
 public:
   CByteBuffer Buf;
   void Init() { _virtPos = 0; }
-
+ 
   MY_UNKNOWN_IMP1(IInStream)
 
   STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
@@ -886,7 +886,7 @@ static HRESULT DataParseExtents(int clusterSizeLog, const CObjectVector<CAttr> &
       (attrs[attrIndexLim - 1].HighVcn + 1) != (attr0.AllocatedSize >> clusterSizeLog) ||
       (attr0.AllocatedSize & ((1 << clusterSizeLog) - 1)) != 0)
     return S_FALSE;
-
+  
   for (int i = attrIndex; i < attrIndexLim; i++)
     if (!attrs[i].ParseExtents(Extents, numPhysClusters, attr0.CompressionUnit))
       return S_FALSE;
@@ -900,7 +900,7 @@ static HRESULT DataParseExtents(int clusterSizeLog, const CObjectVector<CAttr> &
     PRF2(printf("\nSize = %4I64X", Extents[k + 1].Virt - e.Virt));
     PRF2(printf("  Pos = %4I64X", e.Phy));
   }
-
+  
   if (attr0.CompressionUnit != 0)
   {
     if (packSizeCalc != attr0.PackSize)
@@ -1013,7 +1013,7 @@ HRESULT CMftRec::GetStream(IInStream *mainStream, int dataIndex,
         numNonResident++;
 
     const CAttr &attr0 = DataAttrs[ref.Start];
-
+      
     if (numNonResident != 0 || ref.Num != 1)
     {
       if (numNonResident != ref.Num || !attr0.IsCompressionUnitSupported())
@@ -1050,7 +1050,7 @@ int CMftRec::GetNumExtents(int dataIndex, int clusterSizeLog, UInt64 numPhysClus
         numNonResident++;
 
     const CAttr &attr0 = DataAttrs[ref.Start];
-
+      
     if (numNonResident != 0 || ref.Num != 1)
     {
       if (numNonResident != ref.Num || !attr0.IsCompressionUnitSupported())
@@ -1077,7 +1077,7 @@ bool CMftRec::Parse(Byte *p, int sectorSizeLog, UInt32 numSectors, UInt32 recNum
   UInt32 numUsaItems;
   G16(p + 0x04, usaOffset);
   G16(p + 0x06, numUsaItems);
-
+  
   if ((usaOffset & 1) != 0 || usaOffset + numUsaItems * 2 > ((UInt32)1 << sectorSizeLog) - 2 ||
       numUsaItems == 0 || numUsaItems - 1 != numSectors)
     return false;
@@ -1253,7 +1253,7 @@ UString CDatabase::GetItemPath(Int32 index) const
 HRESULT CDatabase::Open()
 {
   Clear();
-
+  
   static const UInt32 kHeaderSize = 512;
   Byte buf[kHeaderSize];
   RINOK(ReadStream_FALSE(InStream, buf, kHeaderSize));
@@ -1263,7 +1263,7 @@ HRESULT CDatabase::Open()
   RINOK(InStream->Seek(0, STREAM_SEEK_END, &fileSize));
   if (fileSize < Header.GetPhySize())
     return S_FALSE;
-
+  
   SeekToCluster(Header.MftCluster);
 
   CMftRec mftRec;
@@ -1274,13 +1274,13 @@ HRESULT CDatabase::Open()
     UInt32 blockSize = 1 << 12;
     ByteBuf.SetCapacity(blockSize);
     RINOK(ReadStream_FALSE(InStream, ByteBuf, blockSize));
-
+    
     UInt32 allocSize = Get32(ByteBuf + 0x1C);
     recSizeLog = GetLog(allocSize);
     if (recSizeLog < Header.SectorSizeLog)
       return false;
     numSectorsInRec = 1 << (recSizeLog - Header.SectorSizeLog);
-    if (!mftRec.Parse(ByteBuf, Header.SectorSizeLog, numSectorsInRec, 0, 0))
+    if (!mftRec.Parse(ByteBuf, Header.SectorSizeLog, numSectorsInRec, 0, NULL))
       return S_FALSE;
     if (!mftRec.IsFILE())
       return S_FALSE;
@@ -1365,7 +1365,7 @@ HRESULT CDatabase::Open()
 
   for (i = 0; i < Recs.Size(); i++)
     Recs[i].ParseDataNames();
-
+  
   for (i = 0; i < Recs.Size(); i++)
   {
     CMftRec &rec = Recs[i];
@@ -1412,11 +1412,11 @@ HRESULT CDatabase::Open()
           item.Name += subName;
           item.Attrib = fna.Attrib;
         }
-
+        
         PRF(printf("\n%3d", i));
         PRF(printf("  attrib=%2x", rec.SiAttr.Attrib));
         PRF(printf(" %S", item.Name));
-
+        
         item.RecIndex = i;
         item.DataIndex = di;
         item.ParentRef = fna.ParentDirRef;
@@ -1427,7 +1427,7 @@ HRESULT CDatabase::Open()
     }
     rec.FileNames.ClearAndFree();
   }
-
+  
   return S_OK;
 }
 
@@ -1604,7 +1604,7 @@ STDMETHODIMP CHandler::GetProperty(UInt32 index, PROPID propID, PROPVARIANT *val
 
     case kpidIsDir: prop = item.IsDir(); break;
     case kpidMTime: NtfsTimeToProp(rec.SiAttr.MTime, prop); break;
-
+      
     case kpidCTime: NtfsTimeToProp(rec.SiAttr.CTime, prop); break;
     case kpidATime: NtfsTimeToProp(rec.SiAttr.ATime, prop); break;
     case kpidAttrib:
@@ -1672,7 +1672,7 @@ STDMETHODIMP CHandler::Extract(const UInt32 *indices, UInt32 numItems,
 
   UInt64 totalPackSize;
   totalSize = totalPackSize = 0;
-
+  
   CByteBuffer buf;
   UInt32 clusterSize = Header.ClusterSize();
   buf.SetCapacity(clusterSize);
