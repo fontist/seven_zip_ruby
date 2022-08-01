@@ -146,7 +146,7 @@ def main
     # MinGW
     $LIBS = "-loleaut32 -static-libgcc -static-libstdc++"
 
-    cpp0x_flag = [ "", "-std=gnu++11", "-std=c++11", "-std=gnu++0x", "-std=c++0x" ].find do |opt|
+    cpp0x_flag = ["", "-std=gnu++11", "-std=c++11", "-std=gnu++0x", "-std=c++0x" ].find do |opt|
       try_compile(sample_cpp_source, "#{opt} -x c++ ")
     end
     raise "C++11 is not supported by the compiler." unless (cpp0x_flag)
@@ -161,7 +161,7 @@ def main
       end
     end
 
-    possible_cpp0x_flags = [ "", "-std=gnu++11", "-std=c++11", "-std=gnu++0x", "-std=c++0x" ].map do |opt|
+    possible_cpp0x_flags = [ "-std=c++17",  "", "-std=gnu++11", "-std=c++11", "-std=gnu++0x", "-std=c++0x" ].map do |opt|
       ["#{opt} -x c++ ", "#{opt} "]
     end.flatten
     cpp0x_flag = possible_cpp0x_flags.find do |opt|
@@ -191,4 +191,3 @@ def main
 end
 
 main
-
