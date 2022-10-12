@@ -52,7 +52,7 @@ describe SevenZipRuby do
 
           expect(info.num_blocks).to be_a Integer
           expect(info.header_size).to be < file.size
-          expect(info.method).to eq "LZMA"
+          expect(info.method).to eq "LZMA:16"
           expect(info.phy_size).to be file.size
           expect(info.solid?).to be true
         end
@@ -700,4 +700,3 @@ describe SevenZipRuby do
   end
 
 end
-
