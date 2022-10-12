@@ -1783,26 +1783,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved)
 }
 #endif
 
-#ifdef _WIN32
-#include "Shlwapi.h"
-static HINSTANCE gDllInstance = NULL;
-
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved)
-{
-    // Perform actions based on the reason for calling.
-    switch( fdwReason ) 
-    { 
-        case DLL_PROCESS_ATTACH:
-            gDllInstance = hinstDLL;
-            break;
-        case DLL_PROCESS_DETACH:
-            gDllInstance = NULL;
-            break;
-    }
-    return TRUE;
-}
-#endif
-
 extern "C" void Init_seven_zip_archive(void)
 {
     using namespace SevenZip;
