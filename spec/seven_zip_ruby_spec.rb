@@ -551,7 +551,9 @@ describe SevenZipRuby do
         next output.string.size
       end
       size.each_cons(2) do |large, small|
-        expect(large - small >= 0).to eq true
+# test data is not that random :)
+# higher compression level may have _small_ negative effect
+        expect(large - small >= -8).to eq true
       end
     end
 
