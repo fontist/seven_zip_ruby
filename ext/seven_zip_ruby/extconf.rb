@@ -101,7 +101,7 @@ EOS
 end
 
 def sample_for_rb_thread_call_without_gvl(have_ruby_thread_h)
-  header = "#include <ruby.h>\n"
+  header = "#include <cstddef>\n#include <ruby.h>\n"
   header += "#include <ruby/thread.h>\n" if (have_ruby_thread_h)
   body = <<'EOS'
 

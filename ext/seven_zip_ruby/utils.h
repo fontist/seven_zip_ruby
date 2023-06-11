@@ -1,6 +1,7 @@
 #ifndef UTILS_H__
 #define UTILS_H__
 
+#include <cstddef>
 #include <string>
 
 #ifdef _WIN32
@@ -24,4 +25,3 @@ VALUE ConvertPropToValue(const PROPVARIANT &prop);
 void ConvertValueToProp(VALUE value, VARTYPE type, PROPVARIANT *prop);
 
 #endif
-

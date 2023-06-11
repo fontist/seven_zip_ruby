@@ -1,6 +1,7 @@
 #ifndef SEVEN_ZIP_ARCHIVE_H__
 #define SEVEN_ZIP_ARCHIVE_H__
 
+#include <cstddef>
 #include <iostream>
 #include <fstream>
 #include <cstdlib>

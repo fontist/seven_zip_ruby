@@ -1,6 +1,7 @@
 #ifndef UTIL_COMMON_H__
 #define UTIL_COMMON_H__
 
+#include <cstddef>
 #include <algorithm>
 #include <functional>
 #include <utility>
