@@ -30,9 +30,38 @@ jobs:
     - run: bundle exec rake build_local
     - run: bundle exec rake spec
 
+
+  test-container:
+    name: Ruby with ${{ matrix.env.CC }} compiler on ${{ matrix.os }}
+    container:
+      image: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ 'alpine:3.18', 'alpine:3.16' ]
+        env:
+          - {CC: gcc, CXX: g++}
+          - {CC: clang, CXX: clang++}
+    runs-on: ubuntu-latest
+    env: ${{ matrix.env }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Install Ruby
+      run: |
+        apk --no-cache --upgrade add build-base cmake git bash   \
+        autoconf make binutils-dev pkgconfig tar ruby-dev clang
+
+    - run: gem install bundler
+    - run: bundle install
+    - run: bundle exec rake build_local
+    - run: bundle exec rake spec
+
   release:
     name: Release gem
-    needs: test
+    needs: [test, test-container]
     runs-on: ubuntu-latest
     if: contains(github.ref, 'refs/tags/v')
     steps:
