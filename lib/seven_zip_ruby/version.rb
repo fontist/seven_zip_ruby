@@ -1,3 +1,1 @@
-module SevenZipRuby
-  VERSION = "1.4.3"
-end
+  VERSION = "1.5.0"
