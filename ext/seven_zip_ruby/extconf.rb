@@ -18,7 +18,7 @@ def create_p7zip_makefile(type)
     link_shared = "-bundle"
     local_libs = "-framework CoreFoundation"
     local_libs_dll = '$(LOCAL_LIBS)'
-  when :linux
+  when :linux, :freebsd
     allflags += ' -DNDEBUG -D_7ZIP_LARGE_PAGES -pipe -s '
     cc_shared = "-fPIC"
     link_shared = "-fPIC -shared"
@@ -50,6 +50,8 @@ def check_ostype
     return :macosx
   elsif (RUBY_PLATFORM.include?("linux"))
     return :linux
+  elsif (RUBY_PLATFORM.include?("freebsd"))
+    return :freebsd    
   else
     raise "Unsupported platform"
   end
