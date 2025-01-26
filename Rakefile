@@ -77,3 +77,5 @@ task :copy_binary do
     FileUtils.cp(src, dest) if (File.exist?(src))
   end
 end
+
+task default: %i[build_local spec]
