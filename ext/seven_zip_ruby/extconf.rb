@@ -10,10 +10,16 @@ SO_TARGET_DIR = File.expand_path(File.dirname(__FILE__), "../../lib/seven_zip_ru
 def create_p7zip_makefile(type)
   config = RbConfig::CONFIG
 
-  allflags = config["ARCH_FLAG"] + ' -O -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_REENTRANT -DENV_UNIX '
+  allflags = config["ARCH_FLAG"] + ' -O -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_REENTRANT -DENV_UNIX -v '
   case(type)
   when :macosx
     allflags += ' -DENV_MACOSX '
+    # Add explicit arch flag and deployment target for arm64 support
+    if RUBY_PLATFORM.include?('arm64')
+      allflags += ' -arch arm64 '
+      # Set minimum deployment target to ensure arm64 compatibility
+      ENV['MACOSX_DEPLOYMENT_TARGET'] = '11.0'
+    end
     cc_shared = nil
     link_shared = "-bundle"
     local_libs = "-framework CoreFoundation"
@@ -30,8 +36,8 @@ def create_p7zip_makefile(type)
 
   makefile_content = <<"EOS"
 ALLFLAGS=#{allflags} $(LOCAL_FLAGS)
-CXX=#{config['CXX']} $(ALLFLAGS)
-CC=#{config['CC']} $(ALLFLAGS)
+CXX=#{config['CXX']} $(ALLFLAGS) -Wall -Wextra
+CC=#{config['CC']} $(ALLFLAGS) -Wall -Wextra
 #{cc_shared_content}
 LINK_SHARED=#{link_shared}
 
@@ -47,11 +53,13 @@ end
 
 def check_ostype
   if (RUBY_PLATFORM.include?("darwin"))
+    # Ensure proper flags are set for macOS compilation
+    ENV['SDKROOT'] = `xcrun --show-sdk-path`.chomp
     return :macosx
   elsif (RUBY_PLATFORM.include?("linux"))
     return :linux
   elsif (RUBY_PLATFORM.include?("freebsd"))
-    return :freebsd    
+    return :freebsd
   else
     raise "Unsupported platform"
   end
@@ -183,6 +191,11 @@ def main
 
     Dir.chdir(File.expand_path("../../p7zip", __FILE__)) do
       create_p7zip_makefile(ostype)
+
+      # Use ARM64-specific makefile for macOS arm64
+      if RUBY_PLATFORM.include?('darwin') && RUBY_PLATFORM.include?('arm64')
+        system("cp makefile.macosx_arm64 makefile.machine")
+      end
 
       make_success = system("make common7z")
       raise "Failed to make p7zip" unless (make_success)
