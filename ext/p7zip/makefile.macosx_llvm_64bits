@@ -14,7 +14,7 @@ ALLFLAGS=-m64 ${OPTFLAGS}  \
 # CC=/Developer/usr/bin/llvm-gcc
 
 # For new Mac OS X :
-XX=/usr/bin/llvm-g++
+CXX=/usr/bin/llvm-g++
 CC=/usr/bin/llvm-gcc
 
 LINK_SHARED=-bundle
@@ -24,4 +24,3 @@ LOCAL_LIBS_DLL=$(LOCAL_LIBS)
 
 OBJ_CRC32=$(OBJ_CRC32_C)
 OBJ_AES=
-
